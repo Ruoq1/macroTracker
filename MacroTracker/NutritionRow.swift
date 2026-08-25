@@ -14,6 +14,12 @@ struct NutritionRow: View {
     var isOverOverride: Bool? = nil
     var subtitle: String? = nil
     var onTap: (() -> Void)? = nil
+    var onQuickAdd: ((Double) -> Void)? = nil
+
+    @State private var pendingAdd: Double = 0
+    @State private var isDragging = false
+    @State private var undoAmount: Double? = nil
+    @State private var undoTask: DispatchWorkItem? = nil
 
     private var isOver: Bool { isOverOverride ?? (consumed > goal) }
     private var referenceBase: Double { statusReference ?? goal }
@@ -56,14 +62,71 @@ struct NutritionRow: View {
                 numberRow
             }
 
-            ProgressView(value: progress)
-                .tint(statusColor ?? .accentColor)
+            if let onQuickAdd {
+                quickAddRuler(onQuickAdd)
+            } else {
+                ProgressView(value: progress)
+                    .tint(statusColor ?? .accentColor)
+            }
 
+            statusLine
+        }
+        .padding(.vertical, 4)
+    }
+
+    @ViewBuilder
+    private var statusLine: some View {
+        if let undoAmount {
+            Button {
+                onQuickAdd?(-undoAmount)
+                withAnimation { self.undoAmount = nil }
+            } label: {
+                Text("\(formatted(undoAmount))\(unit.isEmpty ? "" : " " + unit) added · Undo")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.accentColor)
+            }
+        } else {
             Text(isOverReference ? "\(formatted(abs(referenceRemaining))) \(overLabel)" : "\(formatted(referenceRemaining)) \(underLabel)")
                 .font(.subheadline)
                 .foregroundStyle(statusColor ?? .secondary)
         }
-        .padding(.vertical, 4)
+    }
+
+    private func quickAddRuler(_ onQuickAdd: @escaping (Double) -> Void) -> some View {
+        ZStack {
+            RulerPicker(
+                value: $pendingAdd,
+                range: 0...300,
+                tickSpacing: 10,
+                minorHeight: 10,
+                majorHeight: 22,
+                onDragging: { dragging in isDragging = dragging },
+                onCommit: { amount in
+                    guard amount > 0 else { return }
+                    onQuickAdd(amount)
+                    pendingAdd = 0
+                    showUndo(for: amount)
+                }
+            )
+
+            if isDragging && pendingAdd > 0 {
+                Text("+\(formatted(pendingAdd))\(unit.isEmpty ? "" : " " + unit)")
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(.thinMaterial, in: Capsule())
+                    .offset(y: -28)
+            }
+        }
+        .frame(height: 44)
+    }
+
+    private func showUndo(for amount: Double) {
+        undoTask?.cancel()
+        withAnimation { undoAmount = amount }
+        let task = DispatchWorkItem { withAnimation { undoAmount = nil } }
+        undoTask = task
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: task)
     }
 
     private var numberRow: some View {
@@ -86,8 +149,8 @@ struct NutritionRow: View {
 #Preview {
     VStack(spacing: 32) {
         NutritionRow(title: "Calories", consumed: 1420, goal: 2000, unit: "", sizeScale: 1.0)
-        NutritionRow(title: "Protein", consumed: 175, goal: 160, unit: "g", sizeScale: 1.5, lowThreshold: 0.3) {}
-        NutritionRow(title: "Carbs", consumed: 30, goal: 180, unit: "g", sizeScale: 1.5, lowThreshold: 0.3) {}
+        NutritionRow(title: "Protein", consumed: 175, goal: 160, unit: "g", sizeScale: 1.5, lowThreshold: 0.3, onTap: {}, onQuickAdd: { _ in })
+        NutritionRow(title: "Carbs", consumed: 30, goal: 180, unit: "g", sizeScale: 1.5, lowThreshold: 0.3, onTap: {}, onQuickAdd: { _ in })
     }
     .padding()
 }

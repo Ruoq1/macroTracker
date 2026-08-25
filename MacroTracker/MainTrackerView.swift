@@ -74,8 +74,10 @@ struct MainTrackerView: View {
                         unit: "g",
                         sizeScale: 1.5,
                         lowThreshold: 0.3,
-                        lowColor: lowAlertColor.color
-                    ) { editingMetric = .protein }
+                        lowColor: lowAlertColor.color,
+                        onTap: { editingMetric = .protein },
+                        onQuickAdd: { delta in proteinConsumed = max(0, proteinConsumed + delta) }
+                    )
 
                     NutritionRow(
                         title: "Carbs",
@@ -84,16 +86,20 @@ struct MainTrackerView: View {
                         unit: "g",
                         sizeScale: 1.5,
                         lowThreshold: 0.3,
-                        lowColor: lowAlertColor.color
-                    ) { editingMetric = .carbs }
+                        lowColor: lowAlertColor.color,
+                        onTap: { editingMetric = .carbs },
+                        onQuickAdd: { delta in carbsConsumed = max(0, carbsConsumed + delta) }
+                    )
 
                     NutritionRow(
                         title: "Fat",
                         consumed: fatConsumed,
                         goal: fatGoal,
                         unit: "g",
-                        sizeScale: 1.5
-                    ) { editingMetric = .fat }
+                        sizeScale: 1.5,
+                        onTap: { editingMetric = .fat },
+                        onQuickAdd: { delta in fatConsumed = max(0, fatConsumed + delta) }
+                    )
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 12)

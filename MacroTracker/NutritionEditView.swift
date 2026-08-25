@@ -6,38 +6,44 @@ struct NutritionEditView: View {
     @Binding var consumed: Double
 
     @Environment(\.dismiss) private var dismiss
-    @State private var mode: Mode = .add
-    @State private var input: String = ""
+    @State private var amount: Double = 0
+    @State private var inputMethod: InputMethod = .ruler
     @FocusState private var isFocused: Bool
 
-    private enum Mode: String, CaseIterable {
-        case add = "Add"
-        case set = "Set Total"
+    private let range: ClosedRange<Double> = 0...300
+
+    private enum InputMethod: String, CaseIterable {
+        case ruler = "Ruler"
+        case wheel = "Wheel"
+        case manual = "Type"
     }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                Picker("Mode", selection: $mode) {
-                    ForEach(Mode.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            VStack(spacing: 20) {
+                Text("+\(formatted(amount))\(unit.isEmpty ? "" : " " + unit)")
+                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                    .contentTransition(.numericText())
+                    .animation(.snappy, value: amount)
+
+                Picker("Input Method", selection: $inputMethod) {
+                    ForEach(InputMethod.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                 }
                 .pickerStyle(.segmented)
 
-                TextField(mode == .add ? "Amount" : "New Total", text: $input)
-                    .keyboardType(.decimalPad)
-                    .font(.system(size: 40, weight: .semibold, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .focused($isFocused)
+                inputView
+                    .frame(height: 190)
 
                 Button(action: apply) {
-                    Text(mode == .add ? "Add" : "Set")
+                    Text("Add")
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
                         .foregroundStyle(.white)
                 }
-                .disabled(Double(input) == nil)
+                .disabled(amount <= 0)
+                .opacity(amount <= 0 ? 0.5 : 1)
 
                 Spacer()
             }
@@ -50,21 +56,44 @@ struct NutritionEditView: View {
                     Button("Cancel") { dismiss() }
                 }
             }
-            .onAppear { isFocused = true }
-            .onChange(of: mode) { _, _ in input = "" }
         }
-        .presentationDetents([.height(320)])
+        .presentationDetents([.height(560)])
+    }
+
+    @ViewBuilder
+    private var inputView: some View {
+        switch inputMethod {
+        case .ruler:
+            RulerPicker(value: $amount, range: range)
+        case .wheel:
+            Picker("Amount", selection: Binding(
+                get: { Int(amount) },
+                set: { amount = Double($0) }
+            )) {
+                ForEach(Int(range.lowerBound)...Int(range.upperBound), id: \.self) { n in
+                    Text("\(n)\(unit.isEmpty ? "" : " " + unit)").tag(n)
+                }
+            }
+            .pickerStyle(.wheel)
+            .sensoryFeedback(.selection, trigger: Int(amount))
+        case .manual:
+            TextField("Amount", value: $amount, format: .number)
+                .keyboardType(.decimalPad)
+                .font(.system(size: 34, weight: .semibold, design: .rounded))
+                .multilineTextAlignment(.center)
+                .focused($isFocused)
+                .onAppear { isFocused = true }
+        }
     }
 
     private func apply() {
-        guard let value = Double(input) else { return }
-        switch mode {
-        case .add:
-            consumed = max(0, consumed + value)
-        case .set:
-            consumed = max(0, value)
-        }
+        guard amount > 0 else { return }
+        consumed = max(0, consumed + amount)
         dismiss()
+    }
+
+    private func formatted(_ value: Double) -> String {
+        value.rounded() == value ? String(Int(value)) : String(format: "%.1f", value)
     }
 }
 
