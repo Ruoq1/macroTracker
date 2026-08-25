@@ -50,7 +50,8 @@ struct MainTrackerView: View {
                         consumed: proteinConsumed,
                         goal: proteinGoal,
                         unit: "g",
-                        sizeScale: 1.5
+                        sizeScale: 1.5,
+                        lowThreshold: 0.3
                     ) { editingMetric = .protein }
 
                     NutritionRow(
@@ -58,7 +59,8 @@ struct MainTrackerView: View {
                         consumed: carbsConsumed,
                         goal: carbGoal,
                         unit: "g",
-                        sizeScale: 1.5
+                        sizeScale: 1.5,
+                        lowThreshold: 0.3
                     ) { editingMetric = .carbs }
 
                     NutritionRow(

@@ -6,13 +6,23 @@ struct NutritionRow: View {
     let goal: Double
     let unit: String
     var sizeScale: CGFloat = 1.0
+    var lowThreshold: Double? = nil
     var onTap: (() -> Void)? = nil
 
     private var remaining: Double { goal - consumed }
     private var isOver: Bool { consumed > goal }
+    private var isLow: Bool {
+        guard let lowThreshold, goal > 0, !isOver else { return false }
+        return consumed / goal < lowThreshold
+    }
     private var progress: Double {
         guard goal > 0 else { return 0 }
         return min(consumed / goal, 1.0)
+    }
+    private var statusColor: Color? {
+        if isOver { return .orange }
+        if isLow { return .red }
+        return nil
     }
 
     var body: some View {
@@ -31,11 +41,11 @@ struct NutritionRow: View {
             }
 
             ProgressView(value: progress)
-                .tint(isOver ? .orange : .accentColor)
+                .tint(statusColor ?? .accentColor)
 
             Text(isOver ? "\(formatted(abs(remaining))) over" : "\(formatted(remaining)) left")
                 .font(.subheadline)
-                .foregroundStyle(isOver ? .orange : .secondary)
+                .foregroundStyle(statusColor ?? .secondary)
         }
         .padding(.vertical, 4)
     }
@@ -60,7 +70,8 @@ struct NutritionRow: View {
 #Preview {
     VStack(spacing: 32) {
         NutritionRow(title: "Calories", consumed: 1420, goal: 2000, unit: "", sizeScale: 1.0)
-        NutritionRow(title: "Protein", consumed: 175, goal: 160, unit: "g", sizeScale: 1.5) {}
+        NutritionRow(title: "Protein", consumed: 175, goal: 160, unit: "g", sizeScale: 1.5, lowThreshold: 0.3) {}
+        NutritionRow(title: "Carbs", consumed: 30, goal: 180, unit: "g", sizeScale: 1.5, lowThreshold: 0.3) {}
     }
     .padding()
 }
