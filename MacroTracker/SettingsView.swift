@@ -24,6 +24,26 @@ enum AlertColor: String, CaseIterable, Identifiable {
     }
 }
 
+enum RowInputStyle: String, CaseIterable, Identifiable {
+    case ruler, progressBar
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .ruler: "Ruler"
+        case .progressBar: "Progress Bar"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .ruler: "Drag to quick-add"
+        case .progressBar: "Read-only, shows % of goal"
+        }
+    }
+}
+
 struct SettingsView: View {
     @Binding var tdee: Double
     @Binding var calorieTargetPercent: Double
@@ -47,6 +67,9 @@ struct SettingsView: View {
                 }
                 NavigationLink("Alert Color") {
                     AlertColorSettingsView()
+                }
+                NavigationLink("Input Style") {
+                    RowInputStyleSettingsView()
                 }
             }
             .navigationTitle("Settings")
@@ -89,6 +112,44 @@ private struct AlertColorSettingsView: View {
                     .foregroundStyle(.primary)
                 Spacer()
                 if option == lowAlertColor {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(Color.accentColor)
+                }
+            }
+        }
+    }
+}
+
+private struct RowInputStyleSettingsView: View {
+    @AppStorage("rowInputStyle") private var rowInputStyle: RowInputStyle = .ruler
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(RowInputStyle.allCases, id: \.self, content: styleRow)
+            } footer: {
+                Text("Controls how Protein, Carbs, and Fat are adjusted from the main screen.")
+            }
+        }
+        .navigationTitle("Input Style")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder
+    private func styleRow(for option: RowInputStyle) -> some View {
+        Button {
+            rowInputStyle = option
+        } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(option.label)
+                        .foregroundStyle(.primary)
+                    Text(option.detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                if option == rowInputStyle {
                     Image(systemName: "checkmark")
                         .foregroundStyle(Color.accentColor)
                 }
