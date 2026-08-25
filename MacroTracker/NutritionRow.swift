@@ -98,8 +98,8 @@ struct NutritionRow: View {
                 value: $pendingAdd,
                 range: 0...300,
                 tickSpacing: 10,
-                minorHeight: 10,
-                majorHeight: 22,
+                minorHeight: 8,
+                majorHeight: 18,
                 onDragging: { dragging in isDragging = dragging },
                 onCommit: { amount in
                     guard amount > 0 else { return }
@@ -115,10 +115,10 @@ struct NutritionRow: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
                     .background(.thinMaterial, in: Capsule())
-                    .offset(y: -28)
+                    .offset(y: -24)
             }
         }
-        .frame(height: 44)
+        .frame(height: 32)
     }
 
     private func showUndo(for amount: Double) {

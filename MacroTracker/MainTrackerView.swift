@@ -53,7 +53,7 @@ struct MainTrackerView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 26) {
+                VStack(spacing: 22) {
                     NutritionRow(
                         title: "Calories",
                         consumed: caloriesConsumed,
