@@ -82,7 +82,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					B75D744C2C2B13B576C5E87D = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = G399Y58H9G;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -192,7 +192,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = G399Y58H9G;
 				INFOPLIST_FILE = Generated/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -270,7 +270,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = G399Y58H9G;
 				INFOPLIST_FILE = Generated/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
