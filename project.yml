@@ -18,6 +18,7 @@ targets:
       path: Generated/Info.plist
       properties:
         UILaunchScreen: {}
+        ITSAppUsesNonExemptEncryption: false
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.ruoqi.macrotracker
