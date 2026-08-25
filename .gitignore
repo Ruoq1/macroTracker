@@ -61,3 +61,8 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 build/
+*.certSigningRequest
+*.mobileprovision
+*.cer
+*.p8
+.DS_Store

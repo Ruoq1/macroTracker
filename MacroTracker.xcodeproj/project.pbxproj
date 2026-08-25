@@ -11,10 +11,12 @@
 		11DE40482AE794D3257D8283 /* NutritionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95A45FD857293433E44A95A /* NutritionRow.swift */; };
 		6C23157F2D029EE0DFDBF9C8 /* NutritionEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF119D9EBD308AC05EAD5AF9 /* NutritionEditView.swift */; };
 		74D0F64B620C31DACB98ACD9 /* MainTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2261FEBADBA8A03FEE14D4 /* MainTrackerView.swift */; };
+		9ABF5A17A9E34A1AAC40B644 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1440ACE4FC1E0ECB2818D7AD /* Assets.xcassets */; };
 		BA0B1515B9E0240368D6CB82 /* GoalSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76567E3DD900D415E9D90C50 /* GoalSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1440ACE4FC1E0ECB2818D7AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1D2261FEBADBA8A03FEE14D4 /* MainTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTrackerView.swift; sourceTree = "<group>"; };
 		321AED89BB488D1EC7C1154B /* MacroTracker.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MacroTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		76567E3DD900D415E9D90C50 /* GoalSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalSettingsView.swift; sourceTree = "<group>"; };
@@ -43,6 +45,7 @@
 		EF5E80E8105A0EAFB1109B4D /* MacroTracker */ = {
 			isa = PBXGroup;
 			children = (
+				1440ACE4FC1E0ECB2818D7AD /* Assets.xcassets */,
 				76567E3DD900D415E9D90C50 /* GoalSettingsView.swift */,
 				C898FD80F1AC325AC522C534 /* MacroTrackerApp.swift */,
 				1D2261FEBADBA8A03FEE14D4 /* MainTrackerView.swift */,
@@ -60,6 +63,7 @@
 			buildConfigurationList = 35907956BA40E99012EAB374 /* Build configuration list for PBXNativeTarget "MacroTracker" */;
 			buildPhases = (
 				18FB11D7E90112C6DBA2ECEA /* Sources */,
+				4A867EA27A0EE6BF160153D6 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -83,7 +87,6 @@
 				TargetAttributes = {
 					B75D744C2C2B13B576C5E87D = {
 						DevelopmentTeam = G399Y58H9G;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -105,6 +108,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4A867EA27A0EE6BF160153D6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9ABF5A17A9E34A1AAC40B644 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		18FB11D7E90112C6DBA2ECEA /* Sources */ = {
@@ -267,8 +281,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = G399Y58H9G;
 				INFOPLIST_FILE = Generated/Info.plist;
@@ -279,6 +293,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ruoqi.macrotracker;
+				PROVISIONING_PROFILE_SPECIFIER = "MacroTracker AppStore";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

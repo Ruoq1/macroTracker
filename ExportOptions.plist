@@ -7,6 +7,13 @@
 	<key>teamID</key>
 	<string>G399Y58H9G</string>
 	<key>signingStyle</key>
-	<string>automatic</string>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.ruoqi.macrotracker</key>
+		<string>MacroTracker AppStore</string>
+	</dict>
 </dict>
 </plist>
