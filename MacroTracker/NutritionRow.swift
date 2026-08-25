@@ -5,8 +5,8 @@ struct NutritionRow: View {
     let consumed: Double
     let goal: Double
     let unit: String
-    var emphasized: Bool = false
-    let onTap: () -> Void
+    var sizeScale: CGFloat = 1.0
+    var onTap: (() -> Void)? = nil
 
     private var remaining: Double { goal - consumed }
     private var isOver: Bool { consumed > goal }
@@ -21,18 +21,14 @@ struct NutritionRow: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
 
-            Button(action: onTap) {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(formatted(consumed))
-                        .font(.system(size: emphasized ? 44 : 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(.primary)
-                    Text("/ \(formatted(goal))\(unit.isEmpty ? "" : " " + unit)")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
+            if let onTap {
+                Button(action: onTap) {
+                    numberRow
                 }
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+            } else {
+                numberRow
             }
-            .buttonStyle(.plain)
 
             ProgressView(value: progress)
                 .tint(isOver ? .orange : .accentColor)
@@ -44,6 +40,18 @@ struct NutritionRow: View {
         .padding(.vertical, 4)
     }
 
+    private var numberRow: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Text(formatted(consumed))
+                .font(.system(size: 28 * sizeScale, weight: .bold, design: .rounded))
+                .foregroundStyle(.primary)
+            Text("/ \(formatted(goal))\(unit.isEmpty ? "" : " " + unit)")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+        }
+        .contentShape(Rectangle())
+    }
+
     private func formatted(_ value: Double) -> String {
         value.rounded() == value ? String(Int(value)) : String(format: "%.1f", value)
     }
@@ -51,8 +59,8 @@ struct NutritionRow: View {
 
 #Preview {
     VStack(spacing: 32) {
-        NutritionRow(title: "Calories", consumed: 1420, goal: 2000, unit: "", emphasized: true) {}
-        NutritionRow(title: "Protein", consumed: 175, goal: 160, unit: "g") {}
+        NutritionRow(title: "Calories", consumed: 1420, goal: 2000, unit: "", sizeScale: 1.0)
+        NutritionRow(title: "Protein", consumed: 175, goal: 160, unit: "g", sizeScale: 1.5) {}
     }
     .padding()
 }

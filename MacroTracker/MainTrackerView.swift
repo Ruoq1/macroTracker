@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct MainTrackerView: View {
-    @AppStorage("caloriesConsumed") private var caloriesConsumed = 0.0
     @AppStorage("calorieGoal") private var calorieGoal = 2000.0
     @AppStorage("proteinConsumed") private var proteinConsumed = 0.0
     @AppStorage("proteinGoal") private var proteinGoal = 160.0
@@ -13,53 +12,57 @@ struct MainTrackerView: View {
     @State private var showingSettings = false
     @State private var editingMetric: EditingMetric?
 
+    private var caloriesConsumed: Double {
+        proteinConsumed * 4 + carbsConsumed * 4 + fatConsumed * 9
+    }
+
     private enum EditingMetric: String, Identifiable {
-        case calories, protein, carbs, fat
+        case protein, carbs, fat
         var id: String { rawValue }
 
         var title: String {
             switch self {
-            case .calories: "Calories"
             case .protein: "Protein"
             case .carbs: "Carbs"
             case .fat: "Fat"
             }
         }
-
-        var unit: String { self == .calories ? "" : "g" }
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 30) {
+                VStack(spacing: 26) {
                     NutritionRow(
                         title: "Calories",
                         consumed: caloriesConsumed,
                         goal: calorieGoal,
                         unit: "",
-                        emphasized: true
-                    ) { editingMetric = .calories }
+                        sizeScale: 1.0
+                    )
 
                     NutritionRow(
                         title: "Protein",
                         consumed: proteinConsumed,
                         goal: proteinGoal,
-                        unit: "g"
+                        unit: "g",
+                        sizeScale: 1.5
                     ) { editingMetric = .protein }
 
                     NutritionRow(
                         title: "Carbs",
                         consumed: carbsConsumed,
                         goal: carbGoal,
-                        unit: "g"
+                        unit: "g",
+                        sizeScale: 1.5
                     ) { editingMetric = .carbs }
 
                     NutritionRow(
                         title: "Fat",
                         consumed: fatConsumed,
                         goal: fatGoal,
-                        unit: "g"
+                        unit: "g",
+                        sizeScale: 1.5
                     ) { editingMetric = .fat }
                 }
                 .padding(.horizontal, 24)
@@ -87,7 +90,7 @@ struct MainTrackerView: View {
             .sheet(item: $editingMetric) { metric in
                 NutritionEditView(
                     title: metric.title,
-                    unit: metric.unit,
+                    unit: "g",
                     consumed: binding(for: metric)
                 )
             }
@@ -96,7 +99,6 @@ struct MainTrackerView: View {
 
     private func binding(for metric: EditingMetric) -> Binding<Double> {
         switch metric {
-        case .calories: $caloriesConsumed
         case .protein: $proteinConsumed
         case .carbs: $carbsConsumed
         case .fat: $fatConsumed
