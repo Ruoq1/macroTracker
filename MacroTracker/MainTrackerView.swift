@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct MainTrackerView: View {
-    @AppStorage("calorieGoal") private var calorieGoal = 2000.0
+    @AppStorage("tdee") private var tdee = 2000.0
+    @AppStorage("calorieTargetPercent") private var calorieTargetPercent = 100.0
     @AppStorage("proteinConsumed") private var proteinConsumed = 0.0
     @AppStorage("proteinGoal") private var proteinGoal = 160.0
     @AppStorage("carbsConsumed") private var carbsConsumed = 0.0
@@ -15,6 +16,10 @@ struct MainTrackerView: View {
 
     private var caloriesConsumed: Double {
         proteinConsumed * 4 + carbsConsumed * 4 + fatConsumed * 9
+    }
+
+    private var calorieGoal: Double {
+        tdee * calorieTargetPercent / 100
     }
 
     private var todayString: String {
@@ -43,7 +48,10 @@ struct MainTrackerView: View {
                         consumed: caloriesConsumed,
                         goal: calorieGoal,
                         unit: "",
-                        sizeScale: 1.0
+                        sizeScale: 1.0,
+                        statusReference: tdee,
+                        overLabel: "surplus",
+                        underLabel: "deficit"
                     )
 
                     NutritionRow(
@@ -90,7 +98,8 @@ struct MainTrackerView: View {
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView(
-                    calorieGoal: $calorieGoal,
+                    tdee: $tdee,
+                    calorieTargetPercent: $calorieTargetPercent,
                     proteinGoal: $proteinGoal,
                     carbGoal: $carbGoal,
                     fatGoal: $fatGoal

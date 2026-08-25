@@ -8,10 +8,15 @@ struct NutritionRow: View {
     var sizeScale: CGFloat = 1.0
     var lowThreshold: Double? = nil
     var lowColor: Color = .red
+    var statusReference: Double? = nil
+    var overLabel: String = "over"
+    var underLabel: String = "left"
     var onTap: (() -> Void)? = nil
 
-    private var remaining: Double { goal - consumed }
     private var isOver: Bool { consumed > goal }
+    private var referenceBase: Double { statusReference ?? goal }
+    private var referenceRemaining: Double { referenceBase - consumed }
+    private var isOverReference: Bool { consumed > referenceBase }
     private var isLow: Bool {
         guard let lowThreshold, goal > 0, !isOver else { return false }
         return consumed / goal < lowThreshold
@@ -44,7 +49,7 @@ struct NutritionRow: View {
             ProgressView(value: progress)
                 .tint(statusColor ?? .accentColor)
 
-            Text(isOver ? "\(formatted(abs(remaining))) over" : "\(formatted(remaining)) left")
+            Text(isOverReference ? "\(formatted(abs(referenceRemaining))) \(overLabel)" : "\(formatted(referenceRemaining)) \(underLabel)")
                 .font(.subheadline)
                 .foregroundStyle(statusColor ?? .secondary)
         }

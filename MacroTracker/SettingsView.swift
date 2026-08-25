@@ -25,7 +25,8 @@ enum AlertColor: String, CaseIterable, Identifiable {
 }
 
 struct SettingsView: View {
-    @Binding var calorieGoal: Double
+    @Binding var tdee: Double
+    @Binding var calorieTargetPercent: Double
     @Binding var proteinGoal: Double
     @Binding var carbGoal: Double
     @Binding var fatGoal: Double
@@ -37,7 +38,8 @@ struct SettingsView: View {
             List {
                 NavigationLink("Daily Goals") {
                     GoalSettingsView(
-                        calorieGoal: $calorieGoal,
+                        tdee: $tdee,
+                        calorieTargetPercent: $calorieTargetPercent,
                         proteinGoal: $proteinGoal,
                         carbGoal: $carbGoal,
                         fatGoal: $fatGoal
@@ -97,7 +99,8 @@ private struct AlertColorSettingsView: View {
 
 #Preview {
     SettingsView(
-        calorieGoal: .constant(2000),
+        tdee: .constant(2000),
+        calorieTargetPercent: .constant(80),
         proteinGoal: .constant(160),
         carbGoal: .constant(180),
         fatGoal: .constant(60)
