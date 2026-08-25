@@ -16,6 +16,10 @@ struct MainTrackerView: View {
         proteinConsumed * 4 + carbsConsumed * 4 + fatConsumed * 9
     }
 
+    private var todayString: String {
+        Date.now.formatted(date: .abbreviated, time: .omitted)
+    }
+
     private enum EditingMetric: String, Identifiable {
         case protein, carbs, fat
         var id: String { rawValue }
@@ -68,7 +72,7 @@ struct MainTrackerView: View {
                 .padding(.horizontal, 24)
                 .padding(.top, 12)
             }
-            .navigationTitle("Today")
+            .navigationTitle(todayString)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
