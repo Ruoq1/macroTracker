@@ -8,6 +8,7 @@ struct MainTrackerView: View {
     @AppStorage("carbGoal") private var carbGoal = 180.0
     @AppStorage("fatConsumed") private var fatConsumed = 0.0
     @AppStorage("fatGoal") private var fatGoal = 60.0
+    @AppStorage("lowAlertColor") private var lowAlertColor: AlertColor = .red
 
     @State private var showingSettings = false
     @State private var editingMetric: EditingMetric?
@@ -51,7 +52,8 @@ struct MainTrackerView: View {
                         goal: proteinGoal,
                         unit: "g",
                         sizeScale: 1.5,
-                        lowThreshold: 0.3
+                        lowThreshold: 0.3,
+                        lowColor: lowAlertColor.color
                     ) { editingMetric = .protein }
 
                     NutritionRow(
@@ -60,7 +62,8 @@ struct MainTrackerView: View {
                         goal: carbGoal,
                         unit: "g",
                         sizeScale: 1.5,
-                        lowThreshold: 0.3
+                        lowThreshold: 0.3,
+                        lowColor: lowAlertColor.color
                     ) { editingMetric = .carbs }
 
                     NutritionRow(
@@ -82,11 +85,11 @@ struct MainTrackerView: View {
                     } label: {
                         Image(systemName: "gearshape")
                     }
-                    .accessibilityLabel("Goals")
+                    .accessibilityLabel("Settings")
                 }
             }
             .sheet(isPresented: $showingSettings) {
-                GoalSettingsView(
+                SettingsView(
                     calorieGoal: $calorieGoal,
                     proteinGoal: $proteinGoal,
                     carbGoal: $carbGoal,

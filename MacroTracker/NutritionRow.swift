@@ -7,6 +7,7 @@ struct NutritionRow: View {
     let unit: String
     var sizeScale: CGFloat = 1.0
     var lowThreshold: Double? = nil
+    var lowColor: Color = .red
     var onTap: (() -> Void)? = nil
 
     private var remaining: Double { goal - consumed }
@@ -21,7 +22,7 @@ struct NutritionRow: View {
     }
     private var statusColor: Color? {
         if isOver { return .orange }
-        if isLow { return .red }
+        if isLow { return lowColor }
         return nil
     }
 

@@ -12,6 +12,7 @@
 		6C23157F2D029EE0DFDBF9C8 /* NutritionEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF119D9EBD308AC05EAD5AF9 /* NutritionEditView.swift */; };
 		74D0F64B620C31DACB98ACD9 /* MainTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2261FEBADBA8A03FEE14D4 /* MainTrackerView.swift */; };
 		9ABF5A17A9E34A1AAC40B644 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1440ACE4FC1E0ECB2818D7AD /* Assets.xcassets */; };
+		A17A5474C2FC3EA2E6328FB0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD7B26D57BB33804386B305 /* SettingsView.swift */; };
 		BA0B1515B9E0240368D6CB82 /* GoalSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76567E3DD900D415E9D90C50 /* GoalSettingsView.swift */; };
 /* End PBXBuildFile section */
 
@@ -19,6 +20,7 @@
 		1440ACE4FC1E0ECB2818D7AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1D2261FEBADBA8A03FEE14D4 /* MainTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTrackerView.swift; sourceTree = "<group>"; };
 		321AED89BB488D1EC7C1154B /* MacroTracker.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MacroTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5CD7B26D57BB33804386B305 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		76567E3DD900D415E9D90C50 /* GoalSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalSettingsView.swift; sourceTree = "<group>"; };
 		C898FD80F1AC325AC522C534 /* MacroTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroTrackerApp.swift; sourceTree = "<group>"; };
 		E95A45FD857293433E44A95A /* NutritionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionRow.swift; sourceTree = "<group>"; };
@@ -51,6 +53,7 @@
 				1D2261FEBADBA8A03FEE14D4 /* MainTrackerView.swift */,
 				EF119D9EBD308AC05EAD5AF9 /* NutritionEditView.swift */,
 				E95A45FD857293433E44A95A /* NutritionRow.swift */,
+				5CD7B26D57BB33804386B305 /* SettingsView.swift */,
 			);
 			path = MacroTracker;
 			sourceTree = "<group>";
@@ -130,6 +133,7 @@
 				74D0F64B620C31DACB98ACD9 /* MainTrackerView.swift in Sources */,
 				6C23157F2D029EE0DFDBF9C8 /* NutritionEditView.swift in Sources */,
 				11DE40482AE794D3257D8283 /* NutritionRow.swift in Sources */,
+				A17A5474C2FC3EA2E6328FB0 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,27 +6,17 @@ struct GoalSettingsView: View {
     @Binding var carbGoal: Double
     @Binding var fatGoal: Double
 
-    @Environment(\.dismiss) private var dismiss
-
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("Daily Goals") {
-                    goalRow(label: "Calories", value: $calorieGoal, unit: "")
-                    goalRow(label: "Protein", value: $proteinGoal, unit: "g")
-                    goalRow(label: "Carbs", value: $carbGoal, unit: "g")
-                    goalRow(label: "Fat", value: $fatGoal, unit: "g")
-                }
-            }
-            .navigationTitle("Goals")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
+        Form {
+            Section("Daily Goals") {
+                goalRow(label: "Calories", value: $calorieGoal, unit: "")
+                goalRow(label: "Protein", value: $proteinGoal, unit: "g")
+                goalRow(label: "Carbs", value: $carbGoal, unit: "g")
+                goalRow(label: "Fat", value: $fatGoal, unit: "g")
             }
         }
-        .presentationDetents([.medium])
+        .navigationTitle("Daily Goals")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     @ViewBuilder
@@ -46,10 +36,12 @@ struct GoalSettingsView: View {
 }
 
 #Preview {
-    GoalSettingsView(
-        calorieGoal: .constant(2000),
-        proteinGoal: .constant(160),
-        carbGoal: .constant(180),
-        fatGoal: .constant(60)
-    )
+    NavigationStack {
+        GoalSettingsView(
+            calorieGoal: .constant(2000),
+            proteinGoal: .constant(160),
+            carbGoal: .constant(180),
+            fatGoal: .constant(60)
+        )
+    }
 }
