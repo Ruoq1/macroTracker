@@ -22,6 +22,12 @@ struct MainTrackerView: View {
         tdee * calorieTargetPercent / 100
     }
 
+    /// Cutting (< 100% target): warn once intake creeps past maintenance.
+    /// Bulking (>= 100% target): warn if intake falls short of the surplus goal.
+    private var calorieIsOver: Bool {
+        calorieTargetPercent < 100 ? caloriesConsumed > tdee : caloriesConsumed < calorieGoal
+    }
+
     private var todayString: String {
         Date.now.formatted(date: .abbreviated, time: .omitted)
     }
@@ -51,7 +57,8 @@ struct MainTrackerView: View {
                         sizeScale: 1.0,
                         statusReference: tdee,
                         overLabel: "surplus",
-                        underLabel: "deficit"
+                        underLabel: "deficit",
+                        isOverOverride: calorieIsOver
                     )
 
                     NutritionRow(

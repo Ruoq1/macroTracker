@@ -11,9 +11,10 @@ struct NutritionRow: View {
     var statusReference: Double? = nil
     var overLabel: String = "over"
     var underLabel: String = "left"
+    var isOverOverride: Bool? = nil
     var onTap: (() -> Void)? = nil
 
-    private var isOver: Bool { consumed > goal }
+    private var isOver: Bool { isOverOverride ?? (consumed > goal) }
     private var referenceBase: Double { statusReference ?? goal }
     private var referenceRemaining: Double { referenceBase - consumed }
     private var isOverReference: Bool { consumed > referenceBase }
