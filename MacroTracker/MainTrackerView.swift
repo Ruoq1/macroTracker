@@ -32,6 +32,11 @@ struct MainTrackerView: View {
         Date.now.formatted(date: .abbreviated, time: .omitted)
     }
 
+    private var tdeeLabel: String {
+        let value = tdee.rounded() == tdee ? String(Int(tdee)) : String(format: "%.1f", tdee)
+        return "TDEE \(value)"
+    }
+
     private enum EditingMetric: String, Identifiable {
         case protein, carbs, fat
         var id: String { rawValue }
@@ -58,7 +63,8 @@ struct MainTrackerView: View {
                         statusReference: tdee,
                         overLabel: "surplus",
                         underLabel: "deficit",
-                        isOverOverride: calorieIsOver
+                        isOverOverride: calorieIsOver,
+                        subtitle: tdeeLabel
                     )
 
                     NutritionRow(

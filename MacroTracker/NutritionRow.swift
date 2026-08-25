@@ -12,6 +12,7 @@ struct NutritionRow: View {
     var overLabel: String = "over"
     var underLabel: String = "left"
     var isOverOverride: Bool? = nil
+    var subtitle: String? = nil
     var onTap: (() -> Void)? = nil
 
     private var isOver: Bool { isOverOverride ?? (consumed > goal) }
@@ -34,9 +35,17 @@ struct NutritionRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(title)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
+            HStack {
+                Text(title)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+                if let subtitle {
+                    Spacer()
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+            }
 
             if let onTap {
                 Button(action: onTap) {
