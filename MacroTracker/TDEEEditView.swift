@@ -1,10 +1,12 @@
 import SwiftUI
 
 /// Mirrors Apple's "Today's Move Goal" editor from the Activity app: a
-/// full-height dark card with an X close button, a big stepped number, and a
+/// full-height card with an X close button, a big stepped number, and a
 /// pill confirm button at the bottom. Presented as a `.sheet` with
 /// `.presentationDetents([.large])`, which gives the rounded top corners and
-/// swipe-down-to-dismiss for free.
+/// swipe-down-to-dismiss for free. Uses semantic colors throughout (unlike
+/// Apple's version, which stays black even in Light Mode) so it follows the
+/// rest of the app's light/dark appearance.
 struct TDEEEditView: View {
     @Binding var tdee: Double
     @Environment(\.dismiss) private var dismiss
@@ -20,9 +22,9 @@ struct TDEEEditView: View {
             } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .frame(width: 32, height: 32)
-                    .background(Color.white.opacity(0.18), in: Circle())
+                    .background(Color(.systemGray5), in: Circle())
             }
             .buttonStyle(.plain)
             .padding(.top, 12)
@@ -30,10 +32,10 @@ struct TDEEEditView: View {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Calorie Goal")
                     .font(.title2.weight(.bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 Text("Set your maintenance calories (TDEE). Your surplus or deficit goal is calculated from this number.")
                     .font(.body)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
             }
             .padding(.top, 28)
 
@@ -45,7 +47,7 @@ struct TDEEEditView: View {
                 }
                 Text(formatted(tdee))
                     .font(.system(size: 76, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .contentTransition(.numericText())
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -57,7 +59,7 @@ struct TDEEEditView: View {
 
             Text("CALORIES/DAY")
                 .font(.caption.weight(.bold))
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.top, 10)
 
@@ -66,7 +68,7 @@ struct TDEEEditView: View {
 
             Text("This updates the maintenance calories used across the app.")
                 .font(.footnote)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
 
             Button {
                 dismiss()
@@ -76,7 +78,7 @@ struct TDEEEditView: View {
                     .foregroundStyle(Color.accentColor)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.white.opacity(0.12), in: Capsule())
+                    .background(Color(.systemGray5), in: Capsule())
             }
             .buttonStyle(.plain)
             .padding(.top, 14)
@@ -84,7 +86,7 @@ struct TDEEEditView: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(Color.black)
+        .background(Color(.systemBackground))
         .animation(.snappy, value: tdee)
         .sensoryFeedback(.selection, trigger: tdee)
     }
