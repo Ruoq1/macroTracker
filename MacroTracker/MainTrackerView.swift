@@ -16,6 +16,8 @@ struct MainTrackerView: View {
     @State private var showingSettings = false
     @State private var editingMetric: EditingMetric?
     @State private var pendingAmounts: [EditingMetric: Double] = [:]
+    @State private var confirmBarDragOffset: CGFloat = 0
+    @State private var isDismissingConfirmBar = false
 
     private var caloriesConsumed: Double {
         proteinConsumed * 4 + carbsConsumed * 4 + fatConsumed * 9
@@ -160,37 +162,43 @@ struct MainTrackerView: View {
     }
 
     private var confirmBar: some View {
-        HStack(spacing: 12) {
-            Text(pendingSummary)
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(.white)
-                .lineLimit(2)
-
-            Spacer(minLength: 8)
-
-            Image(systemName: "checkmark.circle.fill")
-                .font(.title2)
-                .foregroundStyle(.white)
-
-            Button {
-                withAnimation(.spring(duration: 0.3)) { pendingAmounts.removeAll() }
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.8))
-                    .frame(width: 32, height: 32)
-                    .background(.white.opacity(0.2), in: Circle())
-            }
-        }
-        .padding(.leading, 22)
-        .padding(.trailing, 14)
-        .padding(.vertical, 14)
-        .frame(maxWidth: .infinity)
-        .background(Color.accentColor, in: Capsule())
-        .contentShape(Capsule())
-        .onTapGesture { commitAllPending() }
-        .padding(.horizontal, 24)
-        .padding(.bottom, 8)
+        Text(pendingSummary)
+            .font(.subheadline.weight(.bold))
+            .foregroundStyle(.white)
+            .lineLimit(2)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 22)
+            .padding(.vertical, 16)
+            .background(Color.accentColor, in: Capsule())
+            .contentShape(Capsule())
+            .offset(x: confirmBarDragOffset)
+            .opacity(isDismissingConfirmBar ? 0 : 1)
+            .onTapGesture { commitAllPending() }
+            .gesture(
+                DragGesture(minimumDistance: 10)
+                    .onChanged { gesture in
+                        confirmBarDragOffset = min(0, gesture.translation.width)
+                    }
+                    .onEnded { gesture in
+                        if gesture.translation.width < -80 {
+                            withAnimation(.easeIn(duration: 0.22)) {
+                                confirmBarDragOffset = -600
+                                isDismissingConfirmBar = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+                                pendingAmounts.removeAll()
+                                confirmBarDragOffset = 0
+                                isDismissingConfirmBar = false
+                            }
+                        } else {
+                            withAnimation(.spring(duration: 0.3)) {
+                                confirmBarDragOffset = 0
+                            }
+                        }
+                    }
+            )
+            .padding(.horizontal, 24)
+            .padding(.bottom, 8)
     }
 
     private var pendingSummary: String {
