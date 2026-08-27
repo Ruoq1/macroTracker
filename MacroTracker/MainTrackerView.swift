@@ -17,6 +17,7 @@ struct MainTrackerView: View {
     @AppStorage("rulerHighlightColor") private var rulerHighlightColor: AlertColor = .red
 
     @State private var showingSettings = false
+    @State private var showingHistory = false
     @State private var editingMetric: EditingMetric?
     @State private var pendingAmounts: [EditingMetric: Double] = [:]
     @State private var confirmBarDragOffset: CGFloat = 0
@@ -75,7 +76,9 @@ struct MainTrackerView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 18) {
+                VStack(alignment: .leading, spacing: 18) {
+                    dateHeader
+
                     NutritionRow(
                         title: "Calories",
                         consumed: caloriesConsumed,
@@ -130,7 +133,8 @@ struct MainTrackerView: View {
                 .padding(.top, 8)
                 .padding(.bottom, hasPending ? 110 : 24)
             }
-            .navigationTitle(todayString)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -163,6 +167,9 @@ struct MainTrackerView: View {
                     consumed: binding(for: metric)
                 )
             }
+            .sheet(isPresented: $showingHistory) {
+                HistoryView()
+            }
         }
         .onAppear {
             resetIfNewDay()
@@ -187,7 +194,21 @@ struct MainTrackerView: View {
         let today = Date()
         let lastDate = Date(timeIntervalSince1970: lastTrackingTimestamp)
 
-        if lastTrackingTimestamp == 0 || !Calendar.current.isDate(lastDate, inSameDayAs: today) {
+        if lastTrackingTimestamp != 0, !Calendar.current.isDate(lastDate, inSameDayAs: today) {
+            HistoryStore.append(DayRecord(
+                date: lastDate,
+                protein: proteinConsumed,
+                carbs: carbsConsumed,
+                fat: fatConsumed,
+                proteinGoal: proteinGoal,
+                carbGoal: carbGoal,
+                fatGoal: fatGoal,
+                calorieGoal: calorieGoal
+            ))
+            proteinConsumed = 0
+            carbsConsumed = 0
+            fatConsumed = 0
+        } else if lastTrackingTimestamp == 0 {
             proteinConsumed = 0
             carbsConsumed = 0
             fatConsumed = 0
@@ -215,6 +236,32 @@ struct MainTrackerView: View {
                 resetIfNewDay()
                 scheduleMidnightTimer()
             }
+        }
+    }
+
+    private var dateHeader: some View {
+        Button {
+            showingHistory = true
+        } label: {
+            Text(todayString)
+                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(dateGlassBackground)
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("View past days")
+    }
+
+    @ViewBuilder
+    private var dateGlassBackground: some View {
+        if #available(iOS 26.0, *) {
+            Capsule().glassEffect(.regular.interactive(), in: Capsule())
+        } else {
+            Capsule()
+                .fill(.ultraThinMaterial)
+                .overlay(Capsule().strokeBorder(.white.opacity(0.35), lineWidth: 0.5))
         }
     }
 
