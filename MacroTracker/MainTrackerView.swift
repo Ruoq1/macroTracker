@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct MainTrackerView: View {
+    @Environment(\.scenePhase) private var scenePhase
+
+    @AppStorage("lastTrackingDate") private var lastTrackingTimestamp: Double = 0
     @AppStorage("tdee") private var tdee = 2000.0
     @AppStorage("calorieTargetPercent") private var calorieTargetPercent = 100.0
     @AppStorage("proteinConsumed") private var proteinConsumed = 0.0
@@ -18,6 +21,8 @@ struct MainTrackerView: View {
     @State private var pendingAmounts: [EditingMetric: Double] = [:]
     @State private var confirmBarDragOffset: CGFloat = 0
     @State private var isDismissingConfirmBar = false
+    @State private var now = Date.now
+    @State private var midnightTimer: Timer?
 
     private var caloriesConsumed: Double {
         proteinConsumed * 4 + carbsConsumed * 4 + fatConsumed * 9
@@ -34,7 +39,7 @@ struct MainTrackerView: View {
     }
 
     private var todayString: String {
-        Date.now.formatted(date: .abbreviated, time: .omitted)
+        now.formatted(date: .abbreviated, time: .omitted)
     }
 
     private var tdeeLabel: String {
@@ -157,6 +162,58 @@ struct MainTrackerView: View {
                     unit: "g",
                     consumed: binding(for: metric)
                 )
+            }
+        }
+        .onAppear {
+            resetIfNewDay()
+            scheduleMidnightTimer()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                resetIfNewDay()
+                scheduleMidnightTimer()
+            }
+        }
+        .onDisappear {
+            midnightTimer?.invalidate()
+        }
+    }
+
+    /// Resets the three tracked macros when the last recorded day differs from
+    /// today. Cheap (a few UserDefaults reads/writes), so it's safe to call
+    /// eagerly on launch and on every foreground/timer tick without any
+    /// visible delay.
+    private func resetIfNewDay() {
+        let today = Date()
+        let lastDate = Date(timeIntervalSince1970: lastTrackingTimestamp)
+
+        if lastTrackingTimestamp == 0 || !Calendar.current.isDate(lastDate, inSameDayAs: today) {
+            proteinConsumed = 0
+            carbsConsumed = 0
+            fatConsumed = 0
+        }
+
+        lastTrackingTimestamp = today.timeIntervalSince1970
+        now = today
+    }
+
+    /// Fires once at the next local midnight so the date/reset update live
+    /// while the app stays open, without requiring a background/foreground
+    /// cycle. iOS suspends timers while backgrounded, so `resetIfNewDay()` on
+    /// scenePhase changes remains the fallback for that case.
+    private func scheduleMidnightTimer() {
+        midnightTimer?.invalidate()
+
+        guard let nextMidnight = Calendar.current.nextDate(
+            after: Date(),
+            matching: DateComponents(hour: 0, minute: 0, second: 0),
+            matchingPolicy: .nextTime
+        ) else { return }
+
+        midnightTimer = Timer.scheduledTimer(withTimeInterval: nextMidnight.timeIntervalSinceNow, repeats: false) { _ in
+            DispatchQueue.main.async {
+                resetIfNewDay()
+                scheduleMidnightTimer()
             }
         }
     }
