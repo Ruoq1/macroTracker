@@ -15,6 +15,8 @@ struct MainTrackerView: View {
 
     @State private var showingSettings = false
     @State private var editingMetric: EditingMetric?
+    @State private var activeMetric: EditingMetric?
+    @State private var pendingAmount: Double = 0
 
     private var caloriesConsumed: Double {
         proteinConsumed * 4 + carbsConsumed * 4 + fatConsumed * 9
@@ -79,7 +81,7 @@ struct MainTrackerView: View {
                         lowColor: lowAlertColor.color,
                         rulerHighlightColor: rulerHighlightColor.color,
                         onTap: { editingMetric = .protein },
-                        onQuickAdd: rowInputStyle == .ruler ? { delta in proteinConsumed = max(0, proteinConsumed + delta) } : nil
+                        quickAddValue: rowInputStyle == .ruler ? pendingBinding(for: .protein) : nil
                     )
 
                     NutritionRow(
@@ -92,7 +94,7 @@ struct MainTrackerView: View {
                         lowColor: lowAlertColor.color,
                         rulerHighlightColor: rulerHighlightColor.color,
                         onTap: { editingMetric = .carbs },
-                        onQuickAdd: rowInputStyle == .ruler ? { delta in carbsConsumed = max(0, carbsConsumed + delta) } : nil
+                        quickAddValue: rowInputStyle == .ruler ? pendingBinding(for: .carbs) : nil
                     )
 
                     NutritionRow(
@@ -103,11 +105,12 @@ struct MainTrackerView: View {
                         sizeScale: 1.5,
                         rulerHighlightColor: rulerHighlightColor.color,
                         onTap: { editingMetric = .fat },
-                        onQuickAdd: rowInputStyle == .ruler ? { delta in fatConsumed = max(0, fatConsumed + delta) } : nil
+                        quickAddValue: rowInputStyle == .ruler ? pendingBinding(for: .fat) : nil
                     )
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 12)
+                .padding(.bottom, 70)
             }
             .navigationTitle(todayString)
             .toolbar {
@@ -118,6 +121,12 @@ struct MainTrackerView: View {
                         Image(systemName: "gearshape")
                     }
                     .accessibilityLabel("Settings")
+                }
+            }
+            .overlay(alignment: .bottom) {
+                if let activeMetric, pendingAmount > 0 {
+                    confirmBar(for: activeMetric)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .sheet(isPresented: $showingSettings) {
@@ -137,6 +146,62 @@ struct MainTrackerView: View {
                 )
             }
         }
+    }
+
+    private func confirmBar(for metric: EditingMetric) -> some View {
+        HStack {
+            Text("+\(formattedAmount) g \(metric.title)")
+                .font(.subheadline.weight(.medium))
+
+            Spacer()
+
+            Button {
+                withAnimation(.spring(duration: 0.3)) { activeMetric = nil }
+                pendingAmount = 0
+            } label: {
+                Image(systemName: "xmark")
+                    .foregroundStyle(.secondary)
+            }
+
+            Button {
+                commitPending(for: metric)
+            } label: {
+                Image(systemName: "checkmark")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .frame(width: 32, height: 32)
+                    .background(Color.accentColor, in: Circle())
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(.regularMaterial, in: Capsule())
+        .padding(.horizontal, 24)
+        .padding(.bottom, 8)
+    }
+
+    private var formattedAmount: String {
+        pendingAmount.rounded() == pendingAmount ? String(Int(pendingAmount)) : String(format: "%.1f", pendingAmount)
+    }
+
+    private func pendingBinding(for metric: EditingMetric) -> Binding<Double> {
+        Binding(
+            get: { activeMetric == metric ? pendingAmount : 0 },
+            set: { newValue in
+                if activeMetric != metric {
+                    withAnimation(.spring(duration: 0.3)) { activeMetric = metric }
+                }
+                pendingAmount = newValue
+            }
+        )
+    }
+
+    private func commitPending(for metric: EditingMetric) {
+        let amount = pendingAmount
+        let target = binding(for: metric)
+        target.wrappedValue = max(0, target.wrappedValue + amount)
+        withAnimation(.spring(duration: 0.3)) { activeMetric = nil }
+        pendingAmount = 0
     }
 
     private func binding(for metric: EditingMetric) -> Binding<Double> {

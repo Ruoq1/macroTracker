@@ -12,7 +12,7 @@ struct RulerPicker: View {
     var minimumDragDistance: CGFloat = 6
     var maxCoast: Double = 8
     var onDragging: ((Bool) -> Void)? = nil
-    var onCommit: ((Double) -> Void)? = nil
+    var onSettled: ((Double) -> Void)? = nil
 
     @State private var dragAnchor: Double?
 
@@ -29,9 +29,9 @@ struct RulerPicker: View {
                     let centerIndex = Int(valueIndex.rounded())
 
                     for i in (centerIndex - halfCount)...(centerIndex + halfCount) {
-                        let tickValue = range.lowerBound + Double(i) * step
-                        guard tickValue >= range.lowerBound, tickValue <= range.upperBound else { continue }
-
+                        // Ticks are drawn for the full visible window even past the valid
+                        // range (e.g. left of 0) purely so the ruler looks symmetric at the
+                        // edges - the drag gesture below still clamps the actual value.
                         let x = centerX + (CGFloat(i) - valueIndex) * tickSpacing
                         let isMajor = i % majorEvery == 0
                         let h = isMajor ? majorHeight : minorHeight
@@ -80,11 +80,11 @@ struct RulerPicker: View {
                                 value = snappedTarget
                             } completion: {
                                 onDragging?(false)
-                                onCommit?(value)
+                                onSettled?(value)
                             }
                         } else {
                             onDragging?(false)
-                            onCommit?(value)
+                            onSettled?(value)
                         }
                     }
             )
