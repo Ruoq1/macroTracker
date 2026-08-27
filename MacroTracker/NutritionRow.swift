@@ -78,15 +78,16 @@ struct NutritionRow: View {
         ZStack {
             RulerPicker(
                 value: quickAddValue,
-                range: 0...300,
+                range: -100...300,
                 minorHeight: 8,
                 majorHeight: 18,
                 majorColor: rulerHighlightColor,
                 onDragging: { dragging in isDragging = dragging }
             )
 
-            if isDragging && quickAddValue.wrappedValue > 0 {
-                Text("+\(formatted(quickAddValue.wrappedValue))\(unit.isEmpty ? "" : " " + unit)")
+            if isDragging && quickAddValue.wrappedValue != 0 {
+                let sign = quickAddValue.wrappedValue > 0 ? "+" : ""
+                Text("\(sign)\(formatted(quickAddValue.wrappedValue))\(unit.isEmpty ? "" : " " + unit)")
                     .font(.caption.weight(.semibold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)

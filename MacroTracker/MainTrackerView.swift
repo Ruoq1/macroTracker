@@ -41,7 +41,7 @@ struct MainTrackerView: View {
     }
 
     private var hasPending: Bool {
-        pendingAmounts.values.contains { $0 > 0 }
+        pendingAmounts.values.contains { $0 != 0 }
     }
 
     private enum EditingMetric: String, Identifiable, CaseIterable {
@@ -53,6 +53,14 @@ struct MainTrackerView: View {
             case .protein: "Protein"
             case .carbs: "Carbs"
             case .fat: "Fat"
+            }
+        }
+
+        var abbreviation: String {
+            switch self {
+            case .protein: "P"
+            case .carbs: "C"
+            case .fat: "F"
             }
         }
     }
@@ -152,34 +160,35 @@ struct MainTrackerView: View {
     }
 
     private var confirmBar: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             Text(pendingSummary)
-                .font(.subheadline.weight(.medium))
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.white)
                 .lineLimit(2)
 
             Spacer(minLength: 8)
+
+            Image(systemName: "checkmark.circle.fill")
+                .font(.title2)
+                .foregroundStyle(.white)
 
             Button {
                 withAnimation(.spring(duration: 0.3)) { pendingAmounts.removeAll() }
             } label: {
                 Image(systemName: "xmark")
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 36, height: 36)
-            }
-
-            Button(action: commitAllPending) {
-                Image(systemName: "checkmark")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 48, height: 48)
-                    .background(Color.accentColor, in: Circle())
+                    .foregroundStyle(.white.opacity(0.8))
+                    .frame(width: 32, height: 32)
+                    .background(.white.opacity(0.2), in: Circle())
             }
         }
-        .padding(.leading, 20)
-        .padding(.trailing, 10)
-        .padding(.vertical, 10)
-        .background(.regularMaterial, in: Capsule())
+        .padding(.leading, 22)
+        .padding(.trailing, 14)
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity)
+        .background(Color.accentColor, in: Capsule())
+        .contentShape(Capsule())
+        .onTapGesture { commitAllPending() }
         .padding(.horizontal, 24)
         .padding(.bottom, 8)
     }
@@ -187,8 +196,9 @@ struct MainTrackerView: View {
     private var pendingSummary: String {
         EditingMetric.allCases
             .compactMap { metric -> String? in
-                guard let amount = pendingAmounts[metric], amount > 0 else { return nil }
-                return "\(metric.title) +\(formatted(amount))g"
+                guard let amount = pendingAmounts[metric], amount != 0 else { return nil }
+                let sign = amount > 0 ? "+" : ""
+                return "\(metric.abbreviation) \(sign)\(formatted(amount))g"
             }
             .joined(separator: "  ·  ")
     }
@@ -202,7 +212,7 @@ struct MainTrackerView: View {
 
     private func commitAllPending() {
         for metric in EditingMetric.allCases {
-            guard let amount = pendingAmounts[metric], amount > 0 else { continue }
+            guard let amount = pendingAmounts[metric], amount != 0 else { continue }
             let target = binding(for: metric)
             target.wrappedValue = max(0, target.wrappedValue + amount)
         }
