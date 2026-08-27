@@ -77,8 +77,6 @@ struct MainTrackerView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    dateHeader
-
                     NutritionRow(
                         title: "Calories",
                         consumed: caloriesConsumed,
@@ -130,11 +128,15 @@ struct MainTrackerView: View {
                     )
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 8)
+                .padding(.top, 68)
                 .padding(.bottom, hasPending ? 110 : 24)
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .overlay(alignment: .top) {
+                dateHeader
+                    .padding(.top, 8)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -244,7 +246,7 @@ struct MainTrackerView: View {
             showingHistory = true
         } label: {
             Text(todayString)
-                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .font(.system(size: 20, weight: .bold, design: .rounded))
                 .foregroundStyle(.primary)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
@@ -257,7 +259,7 @@ struct MainTrackerView: View {
     @ViewBuilder
     private var dateGlassBackground: some View {
         if #available(iOS 26.0, *) {
-            Capsule().glassEffect(.regular.interactive(), in: Capsule())
+            Capsule().glassEffect(.regular.tint(Color.accentColor.opacity(0.4)).interactive(), in: Capsule())
         } else {
             Capsule()
                 .fill(.ultraThinMaterial)
