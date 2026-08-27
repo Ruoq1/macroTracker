@@ -15,8 +15,7 @@ struct MainTrackerView: View {
 
     @State private var showingSettings = false
     @State private var editingMetric: EditingMetric?
-    @State private var activeMetric: EditingMetric?
-    @State private var pendingAmount: Double = 0
+    @State private var pendingAmounts: [EditingMetric: Double] = [:]
 
     private var caloriesConsumed: Double {
         proteinConsumed * 4 + carbsConsumed * 4 + fatConsumed * 9
@@ -41,7 +40,11 @@ struct MainTrackerView: View {
         return "TDEE \(value)"
     }
 
-    private enum EditingMetric: String, Identifiable {
+    private var hasPending: Bool {
+        pendingAmounts.values.contains { $0 > 0 }
+    }
+
+    private enum EditingMetric: String, Identifiable, CaseIterable {
         case protein, carbs, fat
         var id: String { rawValue }
 
@@ -57,7 +60,7 @@ struct MainTrackerView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 22) {
+                VStack(spacing: 18) {
                     NutritionRow(
                         title: "Calories",
                         consumed: caloriesConsumed,
@@ -109,8 +112,8 @@ struct MainTrackerView: View {
                     )
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 12)
-                .padding(.bottom, 70)
+                .padding(.top, 8)
+                .padding(.bottom, hasPending ? 110 : 24)
             }
             .navigationTitle(todayString)
             .toolbar {
@@ -124,8 +127,8 @@ struct MainTrackerView: View {
                 }
             }
             .overlay(alignment: .bottom) {
-                if let activeMetric, pendingAmount > 0 {
-                    confirmBar(for: activeMetric)
+                if hasPending {
+                    confirmBar
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
@@ -148,60 +151,62 @@ struct MainTrackerView: View {
         }
     }
 
-    private func confirmBar(for metric: EditingMetric) -> some View {
-        HStack {
-            Text("+\(formattedAmount) g \(metric.title)")
+    private var confirmBar: some View {
+        HStack(spacing: 14) {
+            Text(pendingSummary)
                 .font(.subheadline.weight(.medium))
+                .lineLimit(2)
 
-            Spacer()
+            Spacer(minLength: 8)
 
             Button {
-                withAnimation(.spring(duration: 0.3)) { activeMetric = nil }
-                pendingAmount = 0
+                withAnimation(.spring(duration: 0.3)) { pendingAmounts.removeAll() }
             } label: {
                 Image(systemName: "xmark")
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(.secondary)
+                    .frame(width: 36, height: 36)
             }
 
-            Button {
-                commitPending(for: metric)
-            } label: {
+            Button(action: commitAllPending) {
                 Image(systemName: "checkmark")
-                    .font(.headline)
+                    .font(.title3.weight(.bold))
                     .foregroundStyle(.white)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 48, height: 48)
                     .background(Color.accentColor, in: Circle())
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.leading, 20)
+        .padding(.trailing, 10)
+        .padding(.vertical, 10)
         .background(.regularMaterial, in: Capsule())
         .padding(.horizontal, 24)
         .padding(.bottom, 8)
     }
 
-    private var formattedAmount: String {
-        pendingAmount.rounded() == pendingAmount ? String(Int(pendingAmount)) : String(format: "%.1f", pendingAmount)
+    private var pendingSummary: String {
+        EditingMetric.allCases
+            .compactMap { metric -> String? in
+                guard let amount = pendingAmounts[metric], amount > 0 else { return nil }
+                return "\(metric.title) +\(formatted(amount))g"
+            }
+            .joined(separator: "  ·  ")
     }
 
     private func pendingBinding(for metric: EditingMetric) -> Binding<Double> {
         Binding(
-            get: { activeMetric == metric ? pendingAmount : 0 },
-            set: { newValue in
-                if activeMetric != metric {
-                    withAnimation(.spring(duration: 0.3)) { activeMetric = metric }
-                }
-                pendingAmount = newValue
-            }
+            get: { pendingAmounts[metric] ?? 0 },
+            set: { newValue in pendingAmounts[metric] = newValue }
         )
     }
 
-    private func commitPending(for metric: EditingMetric) {
-        let amount = pendingAmount
-        let target = binding(for: metric)
-        target.wrappedValue = max(0, target.wrappedValue + amount)
-        withAnimation(.spring(duration: 0.3)) { activeMetric = nil }
-        pendingAmount = 0
+    private func commitAllPending() {
+        for metric in EditingMetric.allCases {
+            guard let amount = pendingAmounts[metric], amount > 0 else { continue }
+            let target = binding(for: metric)
+            target.wrappedValue = max(0, target.wrappedValue + amount)
+        }
+        withAnimation(.spring(duration: 0.3)) { pendingAmounts.removeAll() }
     }
 
     private func binding(for metric: EditingMetric) -> Binding<Double> {
@@ -210,6 +215,10 @@ struct MainTrackerView: View {
         case .carbs: $carbsConsumed
         case .fat: $fatConsumed
         }
+    }
+
+    private func formatted(_ value: Double) -> String {
+        value.rounded() == value ? String(Int(value)) : String(format: "%.1f", value)
     }
 }
 

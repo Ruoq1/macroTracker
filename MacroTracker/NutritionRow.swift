@@ -38,7 +38,7 @@ struct NutritionRow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(title)
                     .font(.subheadline.weight(.medium))
@@ -71,7 +71,7 @@ struct NutritionRow: View {
                 .font(.subheadline)
                 .foregroundStyle(statusColor ?? .secondary)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 
     private func quickAddRuler(_ quickAddValue: Binding<Double>) -> some View {
@@ -94,7 +94,7 @@ struct NutritionRow: View {
                     .offset(y: -24)
             }
         }
-        .frame(height: 32)
+        .frame(height: 28)
     }
 
     private var numberRow: some View {
