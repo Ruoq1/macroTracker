@@ -246,23 +246,9 @@ struct MainTrackerView: View {
             Text(todayString)
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .foregroundStyle(.primary)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(dateGlassBackground)
         }
         .buttonStyle(.plain)
         .accessibilityHint("View past days")
-    }
-
-    @ViewBuilder
-    private var dateGlassBackground: some View {
-        if #available(iOS 26.0, *) {
-            Capsule().glassEffect(.regular.interactive(), in: Capsule())
-        } else {
-            Capsule()
-                .fill(.ultraThinMaterial)
-                .overlay(Capsule().strokeBorder(.white.opacity(0.35), lineWidth: 0.5))
-        }
     }
 
     private var confirmBar: some View {
