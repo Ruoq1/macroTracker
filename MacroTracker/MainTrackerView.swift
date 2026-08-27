@@ -18,6 +18,7 @@ struct MainTrackerView: View {
 
     @State private var showingSettings = false
     @State private var showingHistory = false
+    @State private var showingTDEEEditor = false
     @State private var editingMetric: EditingMetric?
     @State private var pendingAmounts: [EditingMetric: Double] = [:]
     @State private var confirmBarDragOffset: CGFloat = 0
@@ -41,11 +42,6 @@ struct MainTrackerView: View {
 
     private var todayString: String {
         now.formatted(date: .abbreviated, time: .omitted)
-    }
-
-    private var tdeeLabel: String {
-        let value = tdee.rounded() == tdee ? String(Int(tdee)) : String(format: "%.1f", tdee)
-        return "TDEE \(value)"
     }
 
     private var hasPending: Bool {
@@ -89,7 +85,7 @@ struct MainTrackerView: View {
                         overLabel: "surplus",
                         underLabel: "deficit",
                         isOverOverride: calorieIsOver,
-                        subtitle: tdeeLabel
+                        onTap: { showingTDEEEditor = true }
                     )
 
                     NutritionRow(
@@ -169,6 +165,11 @@ struct MainTrackerView: View {
             }
             .sheet(isPresented: $showingHistory) {
                 HistoryView()
+            }
+            .sheet(isPresented: $showingTDEEEditor) {
+                TDEEEditView(tdee: $tdee)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.hidden)
             }
         }
         .onAppear {
