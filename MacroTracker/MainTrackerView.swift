@@ -167,9 +167,19 @@ struct MainTrackerView: View {
                 HistoryView()
             }
             .sheet(isPresented: $showingTDEEEditor) {
-                TDEEEditView(tdee: $tdee)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.hidden)
+                GoalStepperEditView(
+                    title: "Calorie Goal",
+                    description: "Set your maintenance calories (TDEE). Your surplus or deficit goal is calculated from this number.",
+                    unitLabel: "CALORIES/DAY",
+                    footer: "This updates the maintenance calories used across the app.",
+                    confirmLabel: "Update Calorie Goal",
+                    value: $tdee,
+                    step: 50,
+                    range: 500...6000,
+                    accentColor: Color(red: 0.99, green: 0.13, blue: 0.32)
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.hidden)
             }
         }
         .onAppear {

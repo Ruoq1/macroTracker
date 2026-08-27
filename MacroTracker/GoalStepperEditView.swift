@@ -6,14 +6,21 @@ import SwiftUI
 /// `.presentationDetents([.large])`, which gives the rounded top corners and
 /// swipe-down-to-dismiss for free. Uses semantic colors throughout (unlike
 /// Apple's version, which stays black even in Light Mode) so it follows the
-/// rest of the app's light/dark appearance.
-struct TDEEEditView: View {
-    @Binding var tdee: Double
-    @Environment(\.dismiss) private var dismiss
+/// rest of the app's light/dark appearance. Reused for the calorie goal
+/// (TDEE) and each macro goal, distinguished only by the accent color on the
+/// +/- steppers.
+struct GoalStepperEditView: View {
+    let title: String
+    let description: String
+    let unitLabel: String
+    let footer: String
+    let confirmLabel: String
+    @Binding var value: Double
+    var step: Double
+    var range: ClosedRange<Double>
+    var accentColor: Color
 
-    private let step: Double = 50
-    private let range: ClosedRange<Double> = 500...6000
-    private let moveRed = Color(red: 0.99, green: 0.13, blue: 0.32)
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -30,10 +37,10 @@ struct TDEEEditView: View {
             .padding(.top, 12)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("Calorie Goal")
+                Text(title)
                     .font(.title2.weight(.bold))
                     .foregroundStyle(.primary)
-                Text("Set your maintenance calories (TDEE). Your surplus or deficit goal is calculated from this number.")
+                Text(description)
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
@@ -43,21 +50,21 @@ struct TDEEEditView: View {
 
             HStack(spacing: 36) {
                 stepButton(systemImage: "minus") {
-                    tdee = max(range.lowerBound, tdee - step)
+                    value = max(range.lowerBound, value - step)
                 }
-                Text(formatted(tdee))
+                Text(formatted(value))
                     .font(.system(size: 76, weight: .bold))
                     .foregroundStyle(.primary)
                     .contentTransition(.numericText())
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 stepButton(systemImage: "plus") {
-                    tdee = min(range.upperBound, tdee + step)
+                    value = min(range.upperBound, value + step)
                 }
             }
             .frame(maxWidth: .infinity)
 
-            Text("CALORIES/DAY")
+            Text(unitLabel)
                 .font(.caption.weight(.bold))
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -66,14 +73,14 @@ struct TDEEEditView: View {
             Spacer()
             Spacer()
 
-            Text("This updates the maintenance calories used across the app.")
+            Text(footer)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
             Button {
                 dismiss()
             } label: {
-                Text("Update Calorie Goal")
+                Text(confirmLabel)
                     .font(.headline)
                     .foregroundStyle(Color.accentColor)
                     .frame(maxWidth: .infinity)
@@ -87,8 +94,8 @@ struct TDEEEditView: View {
         .padding(.bottom, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color(.systemBackground))
-        .animation(.snappy, value: tdee)
-        .sensoryFeedback(.selection, trigger: tdee)
+        .animation(.snappy, value: value)
+        .sensoryFeedback(.selection, trigger: value)
     }
 
     private func stepButton(systemImage: String, action: @escaping () -> Void) -> some View {
@@ -97,7 +104,7 @@ struct TDEEEditView: View {
                 .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(width: 54, height: 54)
-                .background(moveRed, in: Circle())
+                .background(accentColor, in: Circle())
         }
         .buttonStyle(.plain)
     }
@@ -108,5 +115,15 @@ struct TDEEEditView: View {
 }
 
 #Preview {
-    TDEEEditView(tdee: .constant(2000))
+    GoalStepperEditView(
+        title: "Calorie Goal",
+        description: "Set your maintenance calories (TDEE).",
+        unitLabel: "CALORIES/DAY",
+        footer: "This updates the maintenance calories used across the app.",
+        confirmLabel: "Update Calorie Goal",
+        value: .constant(2000),
+        step: 50,
+        range: 500...6000,
+        accentColor: Color(red: 0.99, green: 0.13, blue: 0.32)
+    )
 }
