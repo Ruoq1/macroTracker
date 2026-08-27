@@ -35,21 +35,21 @@ struct HistoryView: View {
                 Text(record.date.formatted(date: .abbreviated, time: .omitted))
                     .font(.subheadline.weight(.semibold))
                 Spacer()
-                Text("\(formatted(record.calories)) / \(formatted(record.calorieGoal)) kcal")
+                Text("\(formatted(record.calories)) kcal")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             HStack(spacing: 14) {
-                macroLabel("P", record.protein, record.proteinGoal)
-                macroLabel("C", record.carbs, record.carbGoal)
-                macroLabel("F", record.fat, record.fatGoal)
+                macroLabel("P", record.protein)
+                macroLabel("C", record.carbs)
+                macroLabel("F", record.fat)
             }
         }
         .padding(.vertical, 4)
     }
 
-    private func macroLabel(_ abbreviation: String, _ value: Double, _ goal: Double) -> some View {
-        Text("\(abbreviation) \(formatted(value))/\(formatted(goal))g")
+    private func macroLabel(_ abbreviation: String, _ value: Double) -> some View {
+        Text("\(abbreviation) \(formatted(value))g")
             .font(.caption)
             .foregroundStyle(.secondary)
     }
