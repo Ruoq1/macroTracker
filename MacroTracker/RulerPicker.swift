@@ -16,22 +16,34 @@ struct RulerPicker: View {
 
     @State private var dragAnchor: Double?
 
-    private var tickValues: [Double] {
-        stride(from: range.lowerBound, through: range.upperBound, by: step).map { $0 }
-    }
-
     var body: some View {
         GeometryReader { geo in
             let tickSpacing = geo.size.width / CGFloat(visibleTicks)
             let centerX = geo.size.width / 2
+            let centerY = geo.size.height / 2
+            let valueIndex = (value - range.lowerBound) / step
+
             ZStack {
-                HStack(spacing: 0) {
-                    ForEach(tickValues, id: \.self) { tick in
-                        tickView(for: tick)
-                            .frame(width: tickSpacing)
+                Canvas { context, size in
+                    let halfCount = Int(size.width / tickSpacing / 2) + 2
+                    let centerIndex = Int(valueIndex.rounded())
+
+                    for i in (centerIndex - halfCount)...(centerIndex + halfCount) {
+                        let tickValue = range.lowerBound + Double(i) * step
+                        guard tickValue >= range.lowerBound, tickValue <= range.upperBound else { continue }
+
+                        let x = centerX + (CGFloat(i) - valueIndex) * tickSpacing
+                        let isMajor = i % majorEvery == 0
+                        let h = isMajor ? majorHeight : minorHeight
+                        let lineWidth: CGFloat = isMajor ? 2 : 1
+                        let color = isMajor ? majorColor : Color.secondary.opacity(0.35)
+
+                        var path = Path()
+                        path.move(to: CGPoint(x: x, y: centerY - h / 2))
+                        path.addLine(to: CGPoint(x: x, y: centerY + h / 2))
+                        context.stroke(path, with: .color(color), lineWidth: lineWidth)
                     }
                 }
-                .offset(x: centerX - CGFloat((value - range.lowerBound) / step) * tickSpacing - tickSpacing / 2)
 
                 Rectangle()
                     .fill(Color.accentColor)
@@ -39,7 +51,6 @@ struct RulerPicker: View {
                     .frame(maxHeight: .infinity)
             }
             .frame(width: geo.size.width, height: geo.size.height)
-            .clipped()
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: minimumDragDistance)
@@ -79,15 +90,6 @@ struct RulerPicker: View {
             )
         }
         .sensoryFeedback(.selection, trigger: Int((value / step).rounded()))
-    }
-
-    @ViewBuilder
-    private func tickView(for tick: Double) -> some View {
-        let index = Int(((tick - range.lowerBound) / step).rounded())
-        let isMajor = index % majorEvery == 0
-        Rectangle()
-            .fill(isMajor ? majorColor : Color.secondary.opacity(0.35))
-            .frame(width: isMajor ? 2 : 1, height: isMajor ? majorHeight : minorHeight)
     }
 }
 
