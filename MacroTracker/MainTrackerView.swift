@@ -160,7 +160,8 @@ struct MainTrackerView: View {
                 NutritionEditView(
                     title: metric.title,
                     unit: "g",
-                    consumed: binding(for: metric)
+                    consumed: binding(for: metric),
+                    prioritizeManualInput: rowInputStyle == .progressBar
                 )
             }
             .sheet(isPresented: $showingHistory) {

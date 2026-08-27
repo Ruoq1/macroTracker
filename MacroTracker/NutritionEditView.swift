@@ -4,10 +4,11 @@ struct NutritionEditView: View {
     let title: String
     let unit: String
     @Binding var consumed: Double
+    var prioritizeManualInput: Bool = false
 
     @Environment(\.dismiss) private var dismiss
     @State private var amount: Double = 0
-    @State private var inputMethod: InputMethod = .ruler
+    @State private var inputMethod: InputMethod
     @FocusState private var isFocused: Bool
     @AppStorage("rulerHighlightColor") private var rulerHighlightColor: AlertColor = .red
 
@@ -19,6 +20,18 @@ struct NutritionEditView: View {
         case manual = "Type"
     }
 
+    private var orderedMethods: [InputMethod] {
+        prioritizeManualInput ? [.manual, .ruler, .wheel] : [.ruler, .wheel, .manual]
+    }
+
+    init(title: String, unit: String, consumed: Binding<Double>, prioritizeManualInput: Bool = false) {
+        self.title = title
+        self.unit = unit
+        self._consumed = consumed
+        self.prioritizeManualInput = prioritizeManualInput
+        self._inputMethod = State(initialValue: prioritizeManualInput ? .manual : .ruler)
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -28,7 +41,7 @@ struct NutritionEditView: View {
                     .animation(.snappy, value: amount)
 
                 Picker("Input Method", selection: $inputMethod) {
-                    ForEach(InputMethod.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                    ForEach(orderedMethods, id: \.self) { Text($0.rawValue).tag($0) }
                 }
                 .pickerStyle(.segmented)
 
