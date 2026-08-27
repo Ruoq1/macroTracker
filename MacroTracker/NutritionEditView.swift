@@ -9,6 +9,7 @@ struct NutritionEditView: View {
     @State private var amount: Double = 0
     @State private var inputMethod: InputMethod = .ruler
     @FocusState private var isFocused: Bool
+    @AppStorage("rulerHighlightColor") private var rulerHighlightColor: AlertColor = .red
 
     private let range: ClosedRange<Double> = 0...300
 
@@ -64,7 +65,7 @@ struct NutritionEditView: View {
     private var inputView: some View {
         switch inputMethod {
         case .ruler:
-            RulerPicker(value: $amount, range: range)
+            RulerPicker(value: $amount, range: range, majorColor: rulerHighlightColor.color)
         case .wheel:
             Picker("Amount", selection: Binding(
                 get: { Int(amount) },

@@ -13,6 +13,7 @@ struct NutritionRow: View {
     var underLabel: String = "left"
     var isOverOverride: Bool? = nil
     var subtitle: String? = nil
+    var rulerHighlightColor: Color = .red
     var onTap: (() -> Void)? = nil
     var onQuickAdd: ((Double) -> Void)? = nil
 
@@ -97,9 +98,9 @@ struct NutritionRow: View {
             RulerPicker(
                 value: $pendingAdd,
                 range: 0...300,
-                tickSpacing: 10,
                 minorHeight: 8,
                 majorHeight: 18,
+                majorColor: rulerHighlightColor,
                 onDragging: { dragging in isDragging = dragging },
                 onCommit: { amount in
                     guard amount > 0 else { return }

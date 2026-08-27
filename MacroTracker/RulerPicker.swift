@@ -5,10 +5,12 @@ struct RulerPicker: View {
     let range: ClosedRange<Double>
     var step: Double = 1
     var majorEvery: Int = 5
-    var tickSpacing: CGFloat = 14
+    var visibleTicks: Int = 20
     var minorHeight: CGFloat = 16
     var majorHeight: CGFloat = 34
+    var majorColor: Color = .red
     var minimumDragDistance: CGFloat = 6
+    var maxCoast: Double = 8
     var onDragging: ((Bool) -> Void)? = nil
     var onCommit: ((Double) -> Void)? = nil
 
@@ -20,6 +22,7 @@ struct RulerPicker: View {
 
     var body: some View {
         GeometryReader { geo in
+            let tickSpacing = geo.size.width / CGFloat(visibleTicks)
             let centerX = geo.size.width / 2
             ZStack {
                 HStack(spacing: 0) {
@@ -50,10 +53,28 @@ struct RulerPicker: View {
                         let clamped = min(max(raw, range.lowerBound), range.upperBound)
                         value = (clamped / step).rounded() * step
                     }
-                    .onEnded { _ in
+                    .onEnded { gesture in
                         dragAnchor = nil
-                        onDragging?(false)
-                        onCommit?(value)
+
+                        // Momentum: use the system's predicted end translation as a proxy for
+                        // release velocity, but cap how far it can coast so it stays gentle.
+                        let extraTranslation = gesture.predictedEndTranslation.width - gesture.translation.width
+                        let rawExtra = -extraTranslation / tickSpacing * step
+                        let clampedExtra = max(-maxCoast, min(maxCoast, rawExtra))
+                        let target = min(max(value + clampedExtra, range.lowerBound), range.upperBound)
+                        let snappedTarget = (target / step).rounded() * step
+
+                        if snappedTarget != value {
+                            withAnimation(.easeOut(duration: 0.35)) {
+                                value = snappedTarget
+                            } completion: {
+                                onDragging?(false)
+                                onCommit?(value)
+                            }
+                        } else {
+                            onDragging?(false)
+                            onCommit?(value)
+                        }
                     }
             )
         }
@@ -65,7 +86,7 @@ struct RulerPicker: View {
         let index = Int(((tick - range.lowerBound) / step).rounded())
         let isMajor = index % majorEvery == 0
         Rectangle()
-            .fill(isMajor ? Color.primary.opacity(0.7) : Color.secondary.opacity(0.35))
+            .fill(isMajor ? majorColor : Color.secondary.opacity(0.35))
             .frame(width: isMajor ? 2 : 1, height: isMajor ? majorHeight : minorHeight)
     }
 }

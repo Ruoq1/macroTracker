@@ -11,6 +11,7 @@ struct MainTrackerView: View {
     @AppStorage("fatGoal") private var fatGoal = 60.0
     @AppStorage("lowAlertColor") private var lowAlertColor: AlertColor = .red
     @AppStorage("rowInputStyle") private var rowInputStyle: RowInputStyle = .ruler
+    @AppStorage("rulerHighlightColor") private var rulerHighlightColor: AlertColor = .red
 
     @State private var showingSettings = false
     @State private var editingMetric: EditingMetric?
@@ -76,6 +77,7 @@ struct MainTrackerView: View {
                         sizeScale: 1.5,
                         lowThreshold: 0.3,
                         lowColor: lowAlertColor.color,
+                        rulerHighlightColor: rulerHighlightColor.color,
                         onTap: { editingMetric = .protein },
                         onQuickAdd: rowInputStyle == .ruler ? { delta in proteinConsumed = max(0, proteinConsumed + delta) } : nil
                     )
@@ -88,6 +90,7 @@ struct MainTrackerView: View {
                         sizeScale: 1.5,
                         lowThreshold: 0.3,
                         lowColor: lowAlertColor.color,
+                        rulerHighlightColor: rulerHighlightColor.color,
                         onTap: { editingMetric = .carbs },
                         onQuickAdd: rowInputStyle == .ruler ? { delta in carbsConsumed = max(0, carbsConsumed + delta) } : nil
                     )
@@ -98,6 +101,7 @@ struct MainTrackerView: View {
                         goal: fatGoal,
                         unit: "g",
                         sizeScale: 1.5,
+                        rulerHighlightColor: rulerHighlightColor.color,
                         onTap: { editingMetric = .fat },
                         onQuickAdd: rowInputStyle == .ruler ? { delta in fatConsumed = max(0, fatConsumed + delta) } : nil
                     )

@@ -66,7 +66,18 @@ struct SettingsView: View {
                     )
                 }
                 NavigationLink("Alert Color") {
-                    AlertColorSettingsView()
+                    ColorPickerSettingsView(
+                        storageKey: "lowAlertColor",
+                        title: "Alert Color",
+                        footer: "Used when Protein or Carbs intake is far below your goal."
+                    )
+                }
+                NavigationLink("Ruler Color") {
+                    ColorPickerSettingsView(
+                        storageKey: "rulerHighlightColor",
+                        title: "Ruler Color",
+                        footer: "Highlights every 5th tick on the quick-add ruler."
+                    )
                 }
                 NavigationLink("Input Style") {
                     RowInputStyleSettingsView()
@@ -84,25 +95,33 @@ struct SettingsView: View {
     }
 }
 
-private struct AlertColorSettingsView: View {
-    @AppStorage("lowAlertColor") private var lowAlertColor: AlertColor = .red
+private struct ColorPickerSettingsView: View {
+    let title: String
+    let footer: String
+    @AppStorage private var selection: AlertColor
+
+    init(storageKey: String, title: String, footer: String) {
+        self.title = title
+        self.footer = footer
+        _selection = AppStorage(wrappedValue: .red, storageKey)
+    }
 
     var body: some View {
         List {
             Section {
                 ForEach(AlertColor.allCases, id: \.self, content: colorRow)
             } footer: {
-                Text("Used when Protein or Carbs intake is far below your goal.")
+                Text(footer)
             }
         }
-        .navigationTitle("Alert Color")
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
 
     @ViewBuilder
     private func colorRow(for option: AlertColor) -> some View {
         Button {
-            lowAlertColor = option
+            selection = option
         } label: {
             HStack {
                 Circle()
@@ -111,7 +130,7 @@ private struct AlertColorSettingsView: View {
                 Text(option.label)
                     .foregroundStyle(.primary)
                 Spacer()
-                if option == lowAlertColor {
+                if option == selection {
                     Image(systemName: "checkmark")
                         .foregroundStyle(Color.accentColor)
                 }
